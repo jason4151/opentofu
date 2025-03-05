@@ -1,8 +1,8 @@
 # Define the VPC with a configurable /22 CIDR (1,024 IPs)
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr_block
-  enable_dns_support   = true  # Needed for VPC endpoints and DNS resolution
-  enable_dns_hostnames = true  # Ensures proper DNS for private hosted zones and endpoints
+  enable_dns_support   = true # Needed for VPC endpoints and DNS resolution
+  enable_dns_hostnames = true # Ensures proper DNS for private hosted zones and endpoints
 
   tags = {
     Name        = "lab-vpc"
@@ -51,8 +51,8 @@ resource "aws_default_network_acl" "default" {
 
 # Define a custom DHCP Option Set with AWS DNS and NTP
 resource "aws_vpc_dhcp_options" "default" {
-  domain_name_servers = ["AmazonProvidedDNS"]  # AWS-provided DNS servers
-  ntp_servers         = ["169.254.169.123"]    # Amazon Time Sync Service
+  domain_name_servers = ["AmazonProvidedDNS"] # AWS-provided DNS servers
+  ntp_servers         = ["169.254.169.123"]   # Amazon Time Sync Service
 
   tags = {
     Name        = "lab-default-dhcp"
@@ -88,7 +88,7 @@ resource "aws_subnet" "public" {
   count = 2
 
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(var.vpc_cidr_block, 4, count.index)  # /26 (64 IPs)
+  cidr_block              = cidrsubnet(var.vpc_cidr_block, 4, count.index) # /26 (64 IPs)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = true
 
@@ -104,7 +104,7 @@ resource "aws_subnet" "private" {
   count = 2
 
   vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.vpc_cidr_block, 4, count.index + 2)  # Offset by 2, still /26
+  cidr_block        = cidrsubnet(var.vpc_cidr_block, 4, count.index + 2) # Offset by 2, still /26
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
@@ -300,8 +300,8 @@ resource "aws_vpc_endpoint" "dynamodb" {
 
 # S3 bucket for VPC Flow Logs with cost-effective storage
 resource "aws_s3_bucket" "flow_logs" {
-  bucket        = "opentofu-flow-logs-jason4151"  # Must be globally unique
-  force_destroy = true                            # Automatically empty bucket on destroy
+  bucket        = "opentofu-flow-logs-jason4151" # Must be globally unique
+  force_destroy = true                           # Automatically empty bucket on destroy
 
   tags = {
     Name        = "lab-flow-logs-bucket"
@@ -327,12 +327,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "flow_logs_lifecycle" {
 # VPC Flow Logs to S3 with Parquet compression, logging only rejected traffic
 resource "aws_flow_log" "vpc_flow" {
   vpc_id               = aws_vpc.main.id
-  traffic_type         = "REJECT"  # Log only rejected traffic to reduce volume
+  traffic_type         = "REJECT" # Log only rejected traffic to reduce volume
   log_destination      = aws_s3_bucket.flow_logs.arn
-  log_destination_type = "s3"      # Explicitly set to S3 for Parquet support
+  log_destination_type = "s3" # Explicitly set to S3 for Parquet support
   log_format           = "$${version} $${account-id} $${interface-id} $${srcaddr} $${dstaddr} $${srcport} $${dstport} $${protocol} $${packets} $${bytes} $${start} $${end} $${action} $${log-status}"
   destination_options {
-    file_format = "parquet"  # Compresses logs to reduce S3 storage costs
+    file_format = "parquet" # Compresses logs to reduce S3 storage costs
   }
 
   tags = {

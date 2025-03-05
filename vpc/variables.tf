@@ -13,5 +13,5 @@ variable "ha_nat_gateways" {
 variable "enable_nat_gateway" {
   description = "Set to true to enable the NAT Gateway, false to disable it (cost-saving)"
   type        = bool
-  default     = false  # Disabled by default to save costs
+  default     = false # Disabled by default to save costs
 }
