@@ -1,3 +1,5 @@
+# s3_state_bucket/main.tf
+
 # Set up the AWS provider with the desired region
 provider "aws" {
   region = "us-east-2"

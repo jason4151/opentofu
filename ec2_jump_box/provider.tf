@@ -1,3 +1,4 @@
+# ec2_jump_box/provider.tf
 provider "aws" {
   region = "us-east-2"
 }

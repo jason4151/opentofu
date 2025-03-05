@@ -1,4 +1,4 @@
-# vpc/provider.tf
+# analytics/provider.tf
 provider "aws" {
   region = "us-east-2"
 }
@@ -6,7 +6,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket         = "opentofu-state-bucket-jason4151"
-    key            = "vpc/terraform.tfstate"
+    key            = "analytics/terraform.tfstate"
     region         = "us-east-2"
     dynamodb_table = "opentofu-state-lock-jason4151"
   }

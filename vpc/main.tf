@@ -1,3 +1,6 @@
+# vpc/main.tf
+data "aws_caller_identity" "current" {}
+
 # Define the VPC with a configurable /22 CIDR (1,024 IPs)
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr_block
