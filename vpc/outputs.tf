@@ -57,3 +57,9 @@ output "nacl_id" {
   description = "ID of the Network ACL"
   value       = aws_network_acl.main.id
 }
+
+# Output the VPC CIDR Bloack
+output "vpc_cidr_block" {
+  description = "CIDR block of the VPC"
+  value       = aws_vpc.main.cidr_block
+}
