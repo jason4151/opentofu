@@ -45,9 +45,9 @@ resource "aws_s3_bucket_public_access_block" "tofu_state_public_access" {
 
 # Create a DynamoDB table for state locking to prevent concurrent edits
 resource "aws_dynamodb_table" "tofu_state_lock" {
-  name           = "opentofu-state-lock-jason4151"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "LockID"
+  name         = "opentofu-state-lock-jason4151"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
 
   attribute {
     name = "LockID"
