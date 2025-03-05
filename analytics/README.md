@@ -15,8 +15,9 @@ tofu apply
 * A Glue catalog table (vpc_flow_logs) for the Flow Logs in s3://opentofu-flow-logs-jason4151/
 * An Athena workgroup (vpc-logs-workgroup) for running queries
 
-##Query in Athena
+## Query in Athena
 To analyze VPC Flow Logs:
+
 1. Navigate to the AWS Console > Athena.
 2. Select the vpc_logs_db database and vpc_flow_logs table.
 3. Run the following query to check for rejected traffic from the jump-box:
