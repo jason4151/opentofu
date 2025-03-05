@@ -1,7 +1,7 @@
 # Analytics
 This project sets up an analytics layer for querying VPC Flow Logs stored in S3 using AWS Athena and the AWS Glue Data Catalog. It enables troubleshooting of network issues by analyzing Parquet-formatted logs.
 
-## Deploy
+## How to Deploy
 To deploy the analytics configuration:
 
 ```bash
