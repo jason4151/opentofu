@@ -27,7 +27,9 @@ resource "aws_iam_role" "eks_cluster" {
   tags = {
     Name        = "lab-eks-cluster-role"
     Environment = "lab"
+    Owner       = "jason4151"
     Project     = "core-infra"
+    CostCenter  = "lab"
   }
 }
 
@@ -53,7 +55,9 @@ resource "aws_iam_role" "eks_node_group" {
   tags = {
     Name        = "lab-eks-node-group-role"
     Environment = "lab"
+    Owner       = "jason4151"
     Project     = "core-infra"
+    CostCenter  = "lab"
   }
 }
 
@@ -77,9 +81,10 @@ resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
 resource "aws_eks_cluster" "main" {
   name     = "lab-eks-cluster"
   role_arn = aws_iam_role.eks_cluster.arn
+  version  = "1.28" # Pin to a specific version
 
   vpc_config {
-    subnet_ids              = data.terraform_remote_state.vpc.outputs.private_subnet_ids # Control plane in both subnets
+    subnet_ids              = data.terraform_remote_state.vpc.outputs.private_subnet_ids
     endpoint_public_access  = var.enable_public_endpoint
     endpoint_private_access = true
   }
@@ -91,7 +96,9 @@ resource "aws_eks_cluster" "main" {
   tags = {
     Name        = "lab-eks-cluster"
     Environment = "lab"
+    Owner       = "jason4151"
     Project     = "core-infra"
+    CostCenter  = "lab"
   }
 }
 
@@ -100,16 +107,16 @@ resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "lab-node-group"
   node_role_arn   = aws_iam_role.eks_node_group.arn
-  subnet_ids      = [data.terraform_remote_state.vpc.outputs.private_subnet_ids[0]] # Single AZ matching endpoints
+  subnet_ids      = [data.terraform_remote_state.vpc.outputs.private_subnet_ids[0]]
 
   scaling_config {
-    desired_size = var.node_desired_size
+    desired_size = var.node_desired_size # Default 1 from variables.tf
     max_size     = var.node_max_size
     min_size     = var.node_min_size
   }
 
-  instance_types = [var.instance_type]
-  capacity_type  = "ON_DEMAND" # Spot could save more but less predictable for lab
+  instance_types = ["t3.micro"] # Smaller instance for lab
+  capacity_type  = "SPOT"       # Use Spot for cost savings
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_node_policy,
@@ -120,7 +127,43 @@ resource "aws_eks_node_group" "main" {
   tags = {
     Name        = "lab-eks-node-group"
     Environment = "lab"
+    Owner       = "jason4151"
     Project     = "core-infra"
+    CostCenter  = "lab"
+  }
+}
+
+# Data source to fetch the Auto Scaling Group created by EKS
+data "aws_autoscaling_groups" "eks_node_group" {
+  filter {
+    name   = "tag:eks:cluster-name"
+    values = [aws_eks_cluster.main.name]
+  }
+
+  filter {
+    name   = "tag:eks:nodegroup-name"
+    values = [aws_eks_node_group.main.node_group_name]
+  }
+
+  depends_on = [aws_eks_node_group.main]
+}
+
+# Apply tags to the Auto Scaling Group and propagate to EC2 instances using for_each
+resource "aws_autoscaling_group_tag" "node_tags" {
+  for_each = {
+    "Name"        = "lab-eks-node"
+    "Environment" = "lab"
+    "Owner"       = "jason4151"
+    "Project"     = "core-infra"
+    "CostCenter"  = "lab"
+  }
+
+  autoscaling_group_name = data.aws_autoscaling_groups.eks_node_group.names[0]
+
+  tag {
+    key                 = each.key
+    value               = each.value
+    propagate_at_launch = true
   }
 }
 
@@ -147,16 +190,26 @@ resource "aws_security_group" "eks_nodes" {
   }
 
   egress {
-    description = "Allow all outbound traffic"
+    description = "Allow outbound HTTPS to AWS services (ECR/S3/SSM)"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # NAT Gateway + Endpoints handle this
+  }
+
+  egress {
+    description = "Allow all traffic within VPC"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"] # ECR endpoints handle traffic internally
+    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
   }
 
   tags = {
     Name        = "lab-eks-nodes-sg"
     Environment = "lab"
+    Owner       = "jason4151"
     Project     = "core-infra"
+    CostCenter  = "lab"
   }
 }
