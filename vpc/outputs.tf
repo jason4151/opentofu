@@ -1,3 +1,5 @@
+# vpc/outputs.tf
+
 # Output the VPC ID for use in other configurations
 output "vpc_id" {
   description = "ID of the VPC"
