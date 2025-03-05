@@ -18,9 +18,18 @@ tofu apply
 ## Query in Athena
 To analyze VPC Flow Logs:
 
+Navigate to Athena:
 1. Navigate to the AWS Console > Athena.
-2. Select the vpc_logs_db database and vpc_flow_logs table.
-3. Run the following query to check for rejected traffic from the jump-box:
+2. Select the appropriate workgroup config at the top right (e.g., vpc-logs-workgroup).
+3. Select the vpc_logs_db database and vpc_flow_logs table.
+4. Run the following query to check for rejected traffic from the jump-box:
+5. Select Database and Table:
+* In the left sidebar, under Data sources, select AWSDataCatalog.
+* In the Database dropdown, choose vpc_logs_db.
+* In the tables list below, verify vpc_flow_logs appears (it may take a moment after initial VPC deployment).
+
+6. Run the Query:
+In the Query editor tab, paste the following query. Replace <ec2-instance-private-ip> with the appropriate private IP, and then click Run:
 
 ```sql
 SELECT *
@@ -30,7 +39,6 @@ AND dstport = 443
 AND action = 'REJECT'
 LIMIT 100;
 ```
-Replace <ec2-instance-private-ip> with the appropriate private IP.
 
 ## Potential Future Expansions
 This Analytics project can grow beyond its current scope. Here are some possibilities I've thought of:
