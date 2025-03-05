@@ -31,3 +31,19 @@ AND action = 'REJECT'
 LIMIT 100;
 ```
 Replace <ec2-instance-private-ip> with the appropriate private IP.
+
+## Potential Future Expansions
+The `analytics` project can grow beyond its current scope. Here are some possibilities:
+
+- Integrate CloudTrail logs from S3 to audit API calls alongside VPC Flow Logs.
+- Catalog application logs from EC2 instances or services (e.g., web servers) in S3 for analysis.
+- Export CloudWatch Metrics (e.g., EC2 CPU usage) to S3 for querying with Athena.
+- Create Amazon QuickSight dashboards to visualize Flow Log trends, manageable via Terraform.
+- Use Grafana (AWS Managed Grafana) with Athena for real-time network dashboards.
+- Implement AWS Glue Jobs to transform logs (e.g., add IP geolocation data).
+- Apply SageMaker for anomaly detection on Flow Logs, storing results in S3.
+- Analyze AWS Cost Explorer data in S3 to track lab expenses with Athena.
+- Set up Terraform-managed budget alerts based on analytics outputs.
+- Query GuardDuty findings in S3 to cross-reference with Flow Logs for security insights.
+- Feed Athena query results into SNS or Lambda for custom alerts (e.g., high reject rates).
+- Aggregate logs from multiple VPCs (e.g., dev, test) in S3 for unified querying.
