@@ -1,0 +1,31 @@
+# eks/variables.tf
+
+variable "enable_public_endpoint" {
+  description = "Enable public access to the EKS cluster endpoint (set to true for external access)"
+  type        = bool
+  default     = false # Private-only by default for security and cost
+}
+
+variable "instance_type" {
+  description = "Instance type for EKS worker nodes"
+  type        = string
+  default     = "t3.small" # Cheap, 2 vCPUs, 2 GiB RAM
+}
+
+variable "node_desired_size" {
+  description = "Desired number of worker nodes"
+  type        = number
+  default     = 1 # Single node to start
+}
+
+variable "node_max_size" {
+  description = "Maximum number of worker nodes for scaling"
+  type        = number
+  default     = 3 # Allow scaling up to 3 for HA testing
+}
+
+variable "node_min_size" {
+  description = "Minimum number of worker nodes"
+  type        = number
+  default     = 1 # Minimum of 1 to keep costs low
+}
