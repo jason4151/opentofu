@@ -71,3 +71,15 @@ output "account_id" {
   description = "AWS Account ID"
   value       = data.aws_caller_identity.current.account_id
 }
+
+# Output the ID of the ECR API VPC Endpoint
+output "ecr_api_endpoint_id" {
+  description = "ID of the ECR API VPC Endpoint"
+  value       = aws_vpc_endpoint.ecr_api.id
+}
+
+# Output the ID of the ECR DKR VPC Endpoint
+output "ecr_dkr_endpoint_id" {
+  description = "ID of the ECR DKR VPC Endpoint"
+  value       = aws_vpc_endpoint.ecr_dkr.id
+}

@@ -1,4 +1,4 @@
-# ec2_jump_box/provider.tf
+# eks/provider.tf
 
 provider "aws" {
   region = "us-east-2"
@@ -7,7 +7,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket         = "opentofu-state-bucket-jason4151"
-    key            = "ec2_jump_box/terraform.tfstate"
+    key            = "eks/terraform.tfstate"
     region         = "us-east-2"
     dynamodb_table = "opentofu-state-lock-jason4151"
   }
