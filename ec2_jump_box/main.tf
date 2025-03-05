@@ -96,15 +96,14 @@ resource "aws_security_group" "jump_box" {
 }
 
 # EC2 Instance (Jump Box)
-# Placed in a public subnet without a public IP to lower lab costs
-# Uses the IGW for SSM access, avoiding NAT Gateway or VPC Endpoints
 resource "aws_instance" "jump_box" {
+  # Placed in public subnet with public IP to avoid NAT Gateway or VPC Endpoint costs in lab environment
   ami                         = data.aws_ami.amazon_linux_2023.id
   instance_type               = "t3.nano"
   subnet_id                   = data.terraform_remote_state.vpc.outputs.public_subnet_ids[0] # First public subnet
   iam_instance_profile        = aws_iam_instance_profile.jump_box.name
   vpc_security_group_ids      = [aws_security_group.jump_box.id]
-  associate_public_ip_address = false # No public IP
+  associate_public_ip_address = true  # Keep public IP enabled for internet routing
 
   tags = {
     Name        = "jump-box"
