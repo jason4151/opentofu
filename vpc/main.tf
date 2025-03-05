@@ -131,7 +131,7 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Elastic IP for NAT Gateway (conditional)
+# Elastic IP for NAT Gateway
 resource "aws_eip" "nat" {
   count = var.enable_nat_gateway ? (var.ha_nat_gateways ? 2 : 1) : 0
 
@@ -144,7 +144,7 @@ resource "aws_eip" "nat" {
   }
 }
 
-# NAT Gateway (conditional)
+# NAT Gateway (single, in public-subnet-0)
 resource "aws_nat_gateway" "nat" {
   count         = var.enable_nat_gateway ? (var.ha_nat_gateways ? 2 : 1) : 0
   allocation_id = aws_eip.nat[count.index].id
@@ -184,7 +184,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# Private Route Table (conditional HA)
+# Private Route Table (single, with NAT Gateway route)
 resource "aws_route_table" "private" {
   count  = var.enable_nat_gateway && var.ha_nat_gateways ? 2 : 1
   vpc_id = aws_vpc.main.id
@@ -354,7 +354,7 @@ resource "aws_vpc_endpoint" "ecr_api" {
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.us-east-2.ecr.api"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.private[0].id] # Only 1 AZ to save costs
+  subnet_ids          = [aws_subnet.private[0].id]
   security_group_ids  = [aws_security_group.ecr_endpoints.id]
   private_dns_enabled = true
 
@@ -372,7 +372,7 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.us-east-2.ecr.dkr"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [aws_subnet.private[0].id] # Only 1 AZ to save costs
+  subnet_ids          = [aws_subnet.private[0].id]
   security_group_ids  = [aws_security_group.ecr_endpoints.id]
   private_dns_enabled = true
 
@@ -387,8 +387,8 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
 
 # S3 Bucket for VPC Flow Logs
 resource "aws_s3_bucket" "flow_logs" {
-  bucket        = "opentofu-flow-logs-jason4151" # Must be globally unique
-  force_destroy = true                           # Automatically empty bucket on destroy
+  bucket        = "opentofu-flow-logs-jason4151"
+  force_destroy = true
 
   tags = {
     Name        = "lab-flow-logs-bucket"
@@ -415,13 +415,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "flow_logs_lifecycle" {
 # VPC Flow Logs (Rejected Traffic Only)
 resource "aws_flow_log" "vpc_flow" {
   vpc_id               = aws_vpc.main.id
-  traffic_type         = "REJECT" # Log only rejected traffic to reduce volume
+  traffic_type         = "REJECT"
   log_destination      = aws_s3_bucket.flow_logs.arn
-  log_destination_type = "s3"     # Explicitly set to S3 for Parquet support
+  log_destination_type = "s3"
   log_format           = "$${version} $${account-id} $${interface-id} $${srcaddr} $${dstaddr} $${srcport} $${dstport} $${protocol} $${packets} $${bytes} $${start} $${end} $${action} $${log-status}"
 
   destination_options {
-    file_format = "parquet" # Compresses logs to reduce S3 storage costs
+    file_format = "parquet"
   }
 
   tags = {

@@ -4,9 +4,10 @@
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "opentofu-state-bucket-jason4151"
-    key    = "vpc/terraform.tfstate"
-    region = "us-east-2"
+    bucket         = "opentofu-state-bucket-jason4151"
+    key            = "vpc/terraform.tfstate"
+    region         = "us-east-2"
+    dynamodb_table = "opentofu-state-lock-jason4151" # Assuming you have this for consistency
   }
 }
 
@@ -71,20 +72,12 @@ resource "aws_security_group" "jump_box" {
   description = "Security group for jump-box EC2"
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
-  # Egress to internet for SSM (HTTPS)
-  egress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # SSM endpoints via IGW
-  }
-
-  # Egress to VPC CIDR for internal traffic
+  # Egress to internet for SSM (HTTPS) and other needs via NAT Gateway
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
+    cidr_blocks = ["0.0.0.0/0"] # NAT Gateway handles outbound routing
   }
 
   tags = {
@@ -98,13 +91,12 @@ resource "aws_security_group" "jump_box" {
 
 # EC2 Instance (Jump Box)
 resource "aws_instance" "jump_box" {
-  # Placed in public subnet with public IP to avoid NAT Gateway or VPC Endpoint costs in lab environment
-  ami                         = data.aws_ami.amazon_linux_2023.id
-  instance_type               = "t3.nano"
-  subnet_id                   = data.terraform_remote_state.vpc.outputs.public_subnet_ids[0] # First public subnet
-  iam_instance_profile        = aws_iam_instance_profile.jump_box.name
-  vpc_security_group_ids      = [aws_security_group.jump_box.id]
-  associate_public_ip_address = true  # Keep public IP enabled for internet routing
+  ami                    = data.aws_ami.amazon_linux_2023.id
+  instance_type          = "t3.nano"
+  subnet_id              = data.terraform_remote_state.vpc.outputs.private_subnet_ids[0] # Moved to private-subnet-0
+  iam_instance_profile   = aws_iam_instance_profile.jump_box.name
+  vpc_security_group_ids = [aws_security_group.jump_box.id]
+  # No associate_public_ip_address since it's in a private subnet and uses NAT Gateway
 
   tags = {
     Name        = "jump-box"
