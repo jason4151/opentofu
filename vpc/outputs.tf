@@ -16,13 +16,13 @@ output "private_subnet_ids" {
   value       = aws_subnet.private[*].id
 }
 
-# Output the public route table ID (useful for adding custom routes)
+# Output the public route table ID
 output "public_route_table_id" {
   description = "ID of the public route table"
   value       = aws_route_table.public.id
 }
 
-# Output the private route table IDs as a list (single or HA NAT)
+# Output the private route table IDs as a list
 output "private_route_table_ids" {
   description = "List of private route table IDs"
   value       = aws_route_table.private[*].id
@@ -34,13 +34,13 @@ output "internet_gateway_id" {
   value       = aws_internet_gateway.igw.id
 }
 
-# Output the NAT Gateway IDs as a list (single or HA)
+# Output the NAT Gateway IDs as a list
 output "nat_gateway_ids" {
   description = "List of NAT Gateway IDs"
   value       = aws_nat_gateway.nat[*].id
 }
 
-# Output the S3 VPC Endpoint ID (for policy attachments if needed)
+# Output the S3 VPC Endpoint ID
 output "s3_vpc_endpoint_id" {
   description = "ID of the S3 VPC Endpoint"
   value       = aws_vpc_endpoint.s3.id
@@ -52,8 +52,8 @@ output "dynamodb_vpc_endpoint_id" {
   value       = aws_vpc_endpoint.dynamodb.id
 }
 
-# Output the ECR VPC Endpoint ID
-output "ecr_vpc_endpoint_id" {
-  description = "ID of the ECR VPC Endpoint"
-  value       = aws_vpc_endpoint.ecr.id
+# Output the Network ACL ID for downstream rule modifications
+output "nacl_id" {
+  description = "ID of the Network ACL"
+  value       = aws_network_acl.main.id
 }
