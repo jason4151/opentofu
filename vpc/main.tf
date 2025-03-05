@@ -1,5 +1,3 @@
-# vpc/main.tf
-
 # Fetch current AWS account ID for outputs
 data "aws_caller_identity" "current" {}
 
@@ -349,12 +347,12 @@ resource "aws_security_group" "ecr_endpoints" {
   }
 }
 
-# ECR API VPC Endpoint (Interface)
+# ECR API VPC Endpoint (Interface) - Single AZ
 resource "aws_vpc_endpoint" "ecr_api" {
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.us-east-2.ecr.api"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = aws_subnet.private[*].id
+  subnet_ids          = [aws_subnet.private[0].id] # Only 1 AZ to save costs
   security_group_ids  = [aws_security_group.ecr_endpoints.id]
   private_dns_enabled = true
 
@@ -367,12 +365,12 @@ resource "aws_vpc_endpoint" "ecr_api" {
   }
 }
 
-# ECR DKR VPC Endpoint (Interface)
+# ECR DKR VPC Endpoint (Interface) - Single AZ
 resource "aws_vpc_endpoint" "ecr_dkr" {
   vpc_id              = aws_vpc.main.id
   service_name        = "com.amazonaws.us-east-2.ecr.dkr"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = aws_subnet.private[*].id
+  subnet_ids          = [aws_subnet.private[0].id] # Only 1 AZ to save costs
   security_group_ids  = [aws_security_group.ecr_endpoints.id]
   private_dns_enabled = true
 
@@ -417,7 +415,7 @@ resource "aws_flow_log" "vpc_flow" {
   vpc_id               = aws_vpc.main.id
   traffic_type         = "REJECT" # Log only rejected traffic to reduce volume
   log_destination      = aws_s3_bucket.flow_logs.arn
-  log_destination_type = "s3" # Explicitly set to S3 for Parquet support
+  log_destination_type = "s3"     # Explicitly set to S3 for Parquet support
   log_format           = "$${version} $${account-id} $${interface-id} $${srcaddr} $${dstaddr} $${srcport} $${dstport} $${protocol} $${packets} $${bytes} $${start} $${end} $${action} $${log-status}"
 
   destination_options {
