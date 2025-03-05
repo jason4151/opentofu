@@ -1,5 +1,7 @@
 # OpenTofu
 
+## Purpose
+
 This repository contains infrastructure-as-code (IaC) configurations using OpenTofu, an open-source alternative to Terraform. It manages cloud resources (e.g., AWS) for my lab environment. It is **fully compatible with Terraform**, leveraging the same syntax, providers, and modules, while being community-driven and free of proprietary restrictions.
 
 ## Features
