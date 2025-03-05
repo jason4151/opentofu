@@ -60,8 +60,14 @@ output "nacl_id" {
   value       = aws_network_acl.main.id
 }
 
-# Output the VPC CIDR Bloack
+# Output the VPC CIDR Block
 output "vpc_cidr_block" {
   description = "CIDR block of the VPC"
   value       = aws_vpc.main.cidr_block
+}
+
+# Output the AWS Account ID
+output "account_id" {
+  description = "AWS Account ID"
+  value       = data.aws_caller_identity.current.account_id
 }
