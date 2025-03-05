@@ -1,3 +1,5 @@
+# vpc/main.tf
+
 # Fetch current AWS account ID for outputs
 data "aws_caller_identity" "current" {}
 
