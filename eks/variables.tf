@@ -9,13 +9,13 @@ variable "enable_public_endpoint" {
 variable "instance_type" {
   description = "Instance type for EKS worker nodes"
   type        = string
-  default     = "t3.small" # Cheap, 2 vCPUs, 2 GiB RAM
+  default     = "t3.micro" # Smaller instance for lab
 }
 
 variable "node_desired_size" {
   description = "Desired number of worker nodes"
   type        = number
-  default     = 1 # Single node to start
+  default     = 1 # Default to 1, no CLI override needed
 }
 
 variable "node_max_size" {
@@ -27,5 +27,5 @@ variable "node_max_size" {
 variable "node_min_size" {
   description = "Minimum number of worker nodes"
   type        = number
-  default     = 1 # Minimum of 1 to keep costs low
+  default     = 0 # Allow scaling to 0 when idle
 }
