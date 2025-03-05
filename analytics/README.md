@@ -33,7 +33,7 @@ LIMIT 100;
 Replace <ec2-instance-private-ip> with the appropriate private IP.
 
 ## Potential Future Expansions
-The `analytics` project can grow beyond its current scope. Here are some possibilities:
+This Analytics project can grow beyond its current scope. Here are some possibilities I've thought of:
 
 - Integrate CloudTrail logs from S3 to audit API calls alongside VPC Flow Logs.
 - Catalog application logs from EC2 instances or services (e.g., web servers) in S3 for analysis.
