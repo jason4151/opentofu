@@ -196,7 +196,7 @@ resource "aws_route_table_association" "private" {
 resource "aws_network_acl" "main" {
   vpc_id = aws_vpc.main.id
 
-  # Allow HTTP inbound from anywhere for public subnets
+  # Allow inbound HTTP traffic
   ingress {
     protocol   = "tcp"
     rule_no    = 90
@@ -205,8 +205,7 @@ resource "aws_network_acl" "main" {
     from_port  = 80
     to_port    = 80
   }
-
-  # Allow HTTPS inbound from anywhere for public subnets
+  # Allow inbound HTTPS traffic
   ingress {
     protocol   = "tcp"
     rule_no    = 100
@@ -215,8 +214,7 @@ resource "aws_network_acl" "main" {
     from_port  = 443
     to_port    = 443
   }
-
-  # Allow ephemeral ports for return traffic from anywhere
+  # Allow inbound return traffic from internet services
   ingress {
     protocol   = "tcp"
     rule_no    = 120
@@ -225,8 +223,7 @@ resource "aws_network_acl" "main" {
     from_port  = 1024
     to_port    = 65535
   }
-
-  # Allow HTTP outbound for responses
+  # Allow outbound HTTP traffic
   egress {
     protocol   = "tcp"
     rule_no    = 90
@@ -235,8 +232,7 @@ resource "aws_network_acl" "main" {
     from_port  = 80
     to_port    = 80
   }
-
-  # Allow HTTPS outbound for responses
+  # Allow outbound HTTPS traffic
   egress {
     protocol   = "tcp"
     rule_no    = 100
@@ -244,6 +240,15 @@ resource "aws_network_acl" "main" {
     cidr_block = "0.0.0.0/0"
     from_port  = 443
     to_port    = 443
+  }
+  # Allow outbound ephemeral ports for internet traffic
+  egress {
+    protocol   = "tcp"
+    rule_no    = 110
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
   }
 
   tags = {
