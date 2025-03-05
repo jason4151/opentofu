@@ -1,4 +1,5 @@
 # vpc/variables.tf
+
 variable "vpc_cidr_block" {
   description = "The /22 CIDR block for the VPC (e.g., 10.33.0.0/22)"
   type        = string
