@@ -84,7 +84,7 @@ resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
 resource "aws_eks_cluster" "main" {
   name     = "lab-eks-cluster"
   role_arn = aws_iam_role.eks_cluster.arn
-  version  = "1.28"
+  version  = "1.32"
 
   vpc_config {
     subnet_ids              = data.terraform_remote_state.vpc.outputs.private_subnet_ids
