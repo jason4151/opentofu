@@ -6,6 +6,12 @@ variable "enable_public_endpoint" {
   default     = false # Private-only by default for security and cost
 }
 
+variable "public_endpoint_cidr" {
+  description = "CIDR block allowed to access the EKS public endpoint"
+  type        = string
+  default     = "0.0.0.0/0" # Open to all by default; override with my current home IP during apply
+}
+
 variable "instance_type" {
   description = "Instance type for EKS worker nodes"
   type        = string

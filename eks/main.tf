@@ -1,8 +1,5 @@
 # eks/main.tf
 
-# Fetch current AWS account ID
-data "aws_caller_identity" "current" {}
-
 # Fetch the VPC module outputs using remote state
 data "terraform_remote_state" "vpc" {
   backend = "s3"
@@ -13,6 +10,9 @@ data "terraform_remote_state" "vpc" {
     dynamodb_table = "opentofu-state-lock-jason4151"
   }
 }
+
+# Fetch current AWS account ID
+data "aws_caller_identity" "current" {}
 
 # IAM Role for EKS Cluster
 resource "aws_iam_role" "eks_cluster" {
@@ -88,8 +88,9 @@ resource "aws_eks_cluster" "main" {
 
   vpc_config {
     subnet_ids              = data.terraform_remote_state.vpc.outputs.private_subnet_ids
-    endpoint_public_access  = var.enable_public_endpoint
+    endpoint_public_access  = true
     endpoint_private_access = true
+    public_access_cidrs     = [var.public_endpoint_cidr]  # Variable for your home IP
   }
 
   depends_on = [
@@ -252,5 +253,5 @@ resource "kubernetes_config_map" "aws_auth" {
     ])
   }
 
-  depends_on = [aws_eks_node_group.main]
+  depends_on = [aws_eks_cluster.main]
 }
