@@ -1,5 +1,8 @@
 # eks/main.tf
 
+# Fetch current AWS account ID
+data "aws_caller_identity" "current" {}
+
 # Fetch the VPC module outputs using remote state
 data "terraform_remote_state" "vpc" {
   backend = "s3"
@@ -81,7 +84,7 @@ resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
 resource "aws_eks_cluster" "main" {
   name     = "lab-eks-cluster"
   role_arn = aws_iam_role.eks_cluster.arn
-  version  = "1.28" # Pin to a specific version
+  version  = "1.32"
 
   vpc_config {
     subnet_ids              = data.terraform_remote_state.vpc.outputs.private_subnet_ids
@@ -110,13 +113,13 @@ resource "aws_eks_node_group" "main" {
   subnet_ids      = [data.terraform_remote_state.vpc.outputs.private_subnet_ids[0]]
 
   scaling_config {
-    desired_size = var.node_desired_size # Default 1 from variables.tf
+    desired_size = var.node_desired_size
     max_size     = var.node_max_size
     min_size     = var.node_min_size
   }
 
-  instance_types = ["t3.micro"] # Smaller instance for lab
-  capacity_type  = "SPOT"       # Use Spot for cost savings
+  instance_types = ["t3.micro"]
+  capacity_type  = "SPOT"
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_node_policy,
@@ -148,7 +151,7 @@ data "aws_autoscaling_groups" "eks_node_group" {
   depends_on = [aws_eks_node_group.main]
 }
 
-# Apply tags to the Auto Scaling Group and propagate to EC2 instances using for_each
+# Apply tags to the Auto Scaling Group and propagate to EC2 instances
 resource "aws_autoscaling_group_tag" "node_tags" {
   for_each = {
     "Name"        = "lab-eks-node"
@@ -194,7 +197,7 @@ resource "aws_security_group" "eks_nodes" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # NAT Gateway + Endpoints handle this
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -212,4 +215,42 @@ resource "aws_security_group" "eks_nodes" {
     Project     = "core-infra"
     CostCenter  = "lab"
   }
+}
+
+# Kubernetes provider to manage aws-auth ConfigMap
+provider "kubernetes" {
+  host                   = aws_eks_cluster.main.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", aws_eks_cluster.main.name]
+    command     = "aws"
+  }
+}
+
+# Update aws-auth ConfigMap to map jason4151 to system:masters
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+  data = {
+    mapRoles = yamlencode([
+      {
+        rolearn  = aws_iam_role.eks_node_group.arn
+        username = "system:node:{{EC2PrivateDNSName}}"
+        groups   = ["system:bootstrappers", "system:nodes"]
+      }
+    ])
+    mapUsers = yamlencode([
+      {
+        userarn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/jason4151"
+        username = "jason4151"
+        groups   = ["system:masters"]
+      }
+    ])
+  }
+
+  depends_on = [aws_eks_node_group.main]
 }
