@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'iam/**' # Trigger on changes in the iam directory
+      - 'iam/**'
   workflow_dispatch:
     inputs:
       action:
@@ -16,7 +16,7 @@ on:
         options:
           - plan
           - apply
-          - destroy
+          - refresh
 
 permissions:
   contents: read
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: iam # Set working directory to iam/
+        working-directory: iam
 
     steps:
       - name: Checkout Repository
@@ -70,7 +70,7 @@ jobs:
 
       - name: OpenTofu Plan
         id: plan
-        if: github.event.inputs.action != 'destroy' || github.event_name == 'push'
+        if: github.event.inputs.action == 'plan' || github.event_name == 'push'
         run: |
           tofu plan -out=tfplan -no-color
           echo "Plan generated at tfplan"
@@ -82,10 +82,10 @@ jobs:
           steps.plan.outcome == 'success'
         run: tofu apply -no-color -auto-approve tfplan
 
-      - name: OpenTofu Destroy
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
-        run: tofu destroy -no-color -auto-approve
+      - name: OpenTofu Refresh
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'refresh'
+        run: tofu refresh -no-color
 
       - name: Cleanup
-        if: always() && (github.event.inputs.action != 'destroy' || github.event_name == 'push')
+        if: always() && github.event.inputs.action != 'refresh'
         run: rm -f tfplan
