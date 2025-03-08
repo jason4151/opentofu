@@ -48,7 +48,7 @@ jobs:
       - name: Set Workflow Display Name
         run: |
           echo "Updating run name to include action and branch"
-          gh run "$GITHUB_RUN_ID" rename "Deploy IAM - ${{ github.event.inputs.action || 'push' }} on ${{ github.ref_name }}"
+          gh run rename "$GITHUB_RUN_ID" "Deploy IAM - ${{ github.event.inputs.action || 'push' }} on ${{ github.ref_name }}" || echo "Rename not supported, continuing..."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
