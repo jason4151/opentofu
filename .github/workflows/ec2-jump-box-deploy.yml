@@ -18,6 +18,13 @@ on:
           - apply
           - refresh
           - destroy
+  workflow_call:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: string
+        default: 'plan'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
