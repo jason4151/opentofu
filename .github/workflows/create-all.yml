@@ -1,0 +1,47 @@
+name: Create All AWS Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type "DEPLOY" to confirm environment deployment'
+        required: true
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate-confirmation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirmation }}" != "DEPLOY" ]; then
+            echo "Confirmation must be 'DEPLOY'. Aborting."
+            exit 1
+          fi
+          echo "Confirmation valid. Proceeding with deployment."
+
+  deploy-vpc:
+    needs: validate-confirmation
+    uses: ./.github/workflows/vpc-deploy.yml
+    with:
+      action: apply
+    secrets: inherit
+
+  deploy-ec2-jump-box:
+    needs: deploy-vpc
+    uses: ./.github/workflows/ec2-jump-box-deploy.yml
+    with:
+      action: apply
+    secrets: inherit
+
+  deploy-eks:
+    needs: deploy-vpc
+    uses: ./.github/workflows/eks-deploy.yml
+    with:
+      action: apply
+    secrets: inherit
