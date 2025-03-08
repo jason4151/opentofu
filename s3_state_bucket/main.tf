@@ -1,5 +1,9 @@
 # s3_state_bucket/main.tf
 
+provider "aws" {
+  region = "us-east-2"
+}
+
 # Create an S3 bucket to store OpenTofu state files
 resource "aws_s3_bucket" "tofu_state" {
   bucket = "opentofu-state-bucket-jason4151"
