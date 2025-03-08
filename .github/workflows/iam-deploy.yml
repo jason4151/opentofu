@@ -45,11 +45,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Announce Selected Action
+      - name: Annotate Workflow Run with Action
         run: |
           ACTION="${{ github.event.inputs.action || 'push' }}"
-          echo "Selected action: $ACTION on branch ${{ github.ref_name }}"
-          echo "::notice title=Workflow Action::Running $ACTION on ${{ github.ref_name }}"
+          echo "::notice title=Workflow Action::Action: $ACTION, Branch: ${{ github.ref_name }}"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
