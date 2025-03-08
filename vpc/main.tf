@@ -406,6 +406,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "flow_logs_lifecycle" {
   rule {
     id     = "expire-logs"
     status = "Enabled"
+    filter {
+      # Empty filter applies to all objects in the bucket
+    }
     expiration {
       days = 1
     }
