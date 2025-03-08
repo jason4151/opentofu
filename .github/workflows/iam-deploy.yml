@@ -45,12 +45,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set Workflow Display Name
+      - name: Announce Selected Action
         run: |
-          echo "Updating run name to include action and branch"
-          gh run rename "$GITHUB_RUN_ID" "Deploy IAM - ${{ github.event.inputs.action || 'push' }} on ${{ github.ref_name }}" || echo "Rename not supported, continuing..."
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTION="${{ github.event.inputs.action || 'push' }}"
+          echo "Selected action: $ACTION on branch ${{ github.ref_name }}"
+          echo "::notice title=Workflow Action::Running $ACTION on ${{ github.ref_name }}"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
