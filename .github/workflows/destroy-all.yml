@@ -40,7 +40,9 @@ jobs:
     secrets: inherit
 
   destroy-ec2-jump-box:
-    needs: [destroy-analytics, destroy-eks]
+    needs:
+      - destroy-analytics
+      - destroy-eks
     uses: ./.github/workflows/ec2-jump-box-deploy.yml
     with:
       action: destroy
