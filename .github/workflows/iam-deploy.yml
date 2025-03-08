@@ -18,6 +18,10 @@ on:
           - apply
           - refresh
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   id-token: write
@@ -25,6 +29,9 @@ permissions:
 env:
   AWS_REGION: us-east-2
   TOFU_VERSION: 1.8.5
+  TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+  TF_STATE_KEY: iam/terraform.tfstate
+  TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
 
 jobs:
   deploy:
@@ -37,6 +44,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Set Workflow Display Name
+        run: |
+          echo "Updating run name to include action and branch"
+          gh run "$GITHUB_RUN_ID" rename "Deploy IAM - ${{ github.event.inputs.action || 'push' }} on ${{ github.ref_name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -60,10 +74,10 @@ jobs:
       - name: OpenTofu Init
         run: |
           export TF_PLUGIN_CACHE_DIR=~/.terraform.d/plugin-cache
-          tofu init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
-                    -backend-config="key=iam/terraform.tfstate" \
-                    -backend-config="region=${{ env.AWS_REGION }}" \
-                    -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}"
+          tofu init -backend-config="bucket=$TF_STATE_BUCKET" \
+                    -backend-config="key=$TF_STATE_KEY" \
+                    -backend-config="region=$AWS_REGION" \
+                    -backend-config="dynamodb_table=$TF_LOCK_TABLE"
 
       - name: OpenTofu Validate
         run: tofu validate
@@ -87,5 +101,5 @@ jobs:
         run: tofu refresh -no-color
 
       - name: Cleanup
-        if: always() && github.event.inputs.action != 'refresh'
+        if: always() && (github.event.inputs.action != 'refresh')
         run: rm -f tfplan
