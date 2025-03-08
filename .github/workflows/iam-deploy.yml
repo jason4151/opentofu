@@ -45,10 +45,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Annotate Workflow Run with Action
+      - name: Annotate Workflow Run Details
         run: |
           ACTION="${{ github.event.inputs.action || 'push' }}"
           echo "::notice title=Workflow Action::Action: $ACTION, Branch: ${{ github.ref_name }}"
+          echo "::notice title=Workflow Start Time::Started: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          echo "::notice title=Commit SHA::Commit: ${{ github.sha }}"
+          echo "::notice title=OpenTofu Version::OpenTofu Version: ${{ env.TOFU_VERSION }}"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
