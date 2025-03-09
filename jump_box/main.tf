@@ -1,4 +1,4 @@
-# ec2_jump_box/main.tf
+# jump_box/main.tf
 
 # Data source to fetch VPC state from S3
 data "terraform_remote_state" "vpc" {

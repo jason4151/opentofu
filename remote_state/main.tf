@@ -1,4 +1,4 @@
-# s3_state_bucket/main.tf
+# remote_state/main.tf
 
 provider "aws" {
   region = "us-east-2"
