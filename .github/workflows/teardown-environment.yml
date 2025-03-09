@@ -14,39 +14,44 @@ permissions:
   id-token: write
 
 jobs:
-  validate-confirmation:
+  confirm-destroy:
+    name: Confirm Environment Destruction
     runs-on: ubuntu-latest
     steps:
-      - name: Check Confirmation
+      - name: Verify Destroy Confirmation
         run: |
           if [ "${{ github.event.inputs.confirmation }}" != "DESTROY" ]; then
             echo "Confirmation must be 'DESTROY'. Aborting."
             exit 1
           fi
           echo "Confirmation valid. Proceeding with destruction."
-  destroy-analytics:
-    needs: validate-confirmation
+  analytics-destroy:
+    name: Destroy Analytics
+    needs: confirm-destroy
     uses: ./.github/workflows/analytics-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
-  destroy-eks:
-    needs: validate-confirmation
+  eks-destroy:
+    name: Destroy EKS
+    needs: confirm-destroy
     uses: ./.github/workflows/eks-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
-  destroy-jump-box:
-    needs: validate-confirmation
+  jump-box-destroy:
+    name: Destroy Jump Box
+    needs: confirm-destroy
     uses: ./.github/workflows/jump-box-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
-  destroy-vpc:
+  vpc-destroy:
+    name: Destroy VPC
     needs:
-      - destroy-analytics
-      - destroy-eks
-      - destroy-jump-box
+      - analytics-destroy
+      - eks-destroy
+      - jump-box-destroy
     uses: ./.github/workflows/vpc-lifecycle.yml
     with:
       action: destroy

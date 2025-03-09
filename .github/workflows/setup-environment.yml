@@ -14,30 +14,34 @@ permissions:
   id-token: write
 
 jobs:
-  validate-confirmation:
+  confirm-deploy:
+    name: Confirm Environment Deployment
     runs-on: ubuntu-latest
     steps:
-      - name: Check Confirmation
+      - name: Verify Deploy Confirmation
         run: |
           if [ "${{ github.event.inputs.confirmation }}" != "DEPLOY" ]; then
             echo "Confirmation must be 'DEPLOY'. Aborting."
             exit 1
           fi
           echo "Confirmation valid. Proceeding with deployment."
-  deploy-vpc:
-    needs: validate-confirmation
+  vpc-apply:
+    name: Apply VPC
+    needs: confirm-deploy
     uses: ./.github/workflows/vpc-lifecycle.yml
     with:
       action: apply
     secrets: inherit
-  deploy-jump-box:
-    needs: deploy-vpc
+  jump-box-apply:
+    name: Apply Jump Box
+    needs: vpc-apply
     uses: ./.github/workflows/jump-box-lifecycle.yml
     with:
       action: apply
     secrets: inherit
-  deploy-eks:
-    needs: deploy-vpc
+  eks-apply:
+    name: Apply EKS
+    needs: vpc-apply
     uses: ./.github/workflows/eks-lifecycle.yml
     with:
       action: apply
