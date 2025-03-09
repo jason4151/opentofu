@@ -44,16 +44,17 @@ jobs:
     secrets: inherit
 
   destroy-ec2-jump-box:
-    needs:
-      - destroy-analytics
-      - destroy-eks
+    needs: validate-confirmation
     uses: ./.github/workflows/ec2-jump-box-deploy.yml
     with:
       action: destroy
     secrets: inherit
 
   destroy-vpc:
-    needs: destroy-ec2-jump-box
+    needs:
+      - destroy-analytics
+      - destroy-eks
+      - destroy-ec2-jump-box
     uses: ./.github/workflows/vpc-deploy.yml
     with:
       action: destroy
