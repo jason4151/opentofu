@@ -17,7 +17,7 @@ on:
           - plan
           - apply
           - refresh
-          
+
 permissions:
   contents: read
   id-token: write
@@ -36,30 +36,25 @@ jobs:
     defaults:
       run:
         working-directory: iam
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Annotate Workflow Run Details
         run: |
-          ACTION="${{ github.event.inputs.action || 'push' }}"
+          ACTION="${{ inputs.action || 'push' }}"
           echo "::notice title=Workflow Action::Action: $ACTION, Branch: ${{ github.ref_name }}"
           echo "::notice title=Workflow Start Time::Started: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           echo "::notice title=Commit SHA::Commit: ${{ github.sha }}"
           echo "::notice title=OpenTofu Version::OpenTofu Version: ${{ env.TOFU_VERSION }}"
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
           aws-region: ${{ env.AWS_REGION }}
-
       - name: Setup OpenTofu
         uses: opentofu/setup-opentofu@v1
         with:
           tofu_version: ${{ env.TOFU_VERSION }}
-
       - name: Cache OpenTofu Providers
         uses: actions/cache@v3
         with:
@@ -67,7 +62,6 @@ jobs:
           key: ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-${{ hashFiles('iam/*.tf') }}
           restore-keys: |
             ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-
-
       - name: OpenTofu Init
         run: |
           export TF_PLUGIN_CACHE_DIR=~/.terraform.d/plugin-cache
@@ -75,25 +69,20 @@ jobs:
                     -backend-config="key=$TF_STATE_KEY" \
                     -backend-config="region=$AWS_REGION" \
                     -backend-config="dynamodb_table=$TF_LOCK_TABLE"
-
       - name: OpenTofu Validate
         run: tofu validate
-
       - name: OpenTofu Plan
         id: plan
-        if: github.event_name == 'push' || contains(fromJson('["plan", "apply"]'), github.event.inputs.action)
+        if: github.event_name == 'push' || inputs.action == 'plan' || inputs.action == 'apply'
         run: |
           tofu plan -out=tfplan -no-color
           echo "Plan generated at tfplan"
-
       - name: OpenTofu Apply
-        if: (github.event_name == 'push' || github.event.inputs.action == 'apply') && steps.plan.outcome == 'success'
+        if: (github.event_name == 'push' || inputs.action == 'apply') && steps.plan.outcome == 'success'
         run: tofu apply -no-color -auto-approve tfplan
-
       - name: OpenTofu Refresh
-        if: github.event.inputs.action == 'refresh'
+        if: inputs.action == 'refresh'
         run: tofu refresh -no-color
-
       - name: Cleanup
-        if: always() && contains(fromJson('["push", "plan", "apply"]'), github.event_name == 'push' || github.event.inputs.action)
+        if: always() && (github.event_name == 'push' || inputs.action == 'plan' || inputs.action == 'apply')
         run: rm -f tfplan
