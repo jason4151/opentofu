@@ -1,4 +1,4 @@
-name: Destroy All AWS Environment
+name: Tear Down AWS Environment
 
 on:
   workflow_dispatch:
@@ -13,10 +13,6 @@ permissions:
   contents: read
   id-token: write
 
-concurrency:
-  group: destroy-all-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   validate-confirmation:
     runs-on: ubuntu-latest
@@ -28,28 +24,24 @@ jobs:
             exit 1
           fi
           echo "Confirmation valid. Proceeding with destruction."
-
   destroy-analytics:
     needs: validate-confirmation
-    uses: ./.github/workflows/analytics-deploy.yml
+    uses: ./.github/workflows/analytics-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
-
   destroy-eks:
     needs: validate-confirmation
     uses: ./.github/workflows/eks-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
-
-  destroy-ec2-jump-box:
+  destroy-jump-box:
     needs: validate-confirmation
-    uses: ./.github/workflows/ec2-jump-box-lifecycle.yml
+    uses: ./.github/workflows/jump-box-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
-
   destroy-vpc:
     needs:
       - destroy-analytics

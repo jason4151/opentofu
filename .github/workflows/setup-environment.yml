@@ -1,4 +1,4 @@
-name: Create All AWS Environment
+name: Set Up AWS Environment
 
 on:
   workflow_dispatch:
@@ -24,21 +24,18 @@ jobs:
             exit 1
           fi
           echo "Confirmation valid. Proceeding with deployment."
-
   deploy-vpc:
     needs: validate-confirmation
     uses: ./.github/workflows/vpc-lifecycle.yml
     with:
       action: apply
     secrets: inherit
-
-  deploy-ec2-jump-box:
+  deploy-jump-box:
     needs: deploy-vpc
-    uses: ./.github/workflows/ec2-jump-box-lifecycle.yml
+    uses: ./.github/workflows/jump-box-lifecycle.yml
     with:
       action: apply
     secrets: inherit
-
   deploy-eks:
     needs: deploy-vpc
     uses: ./.github/workflows/eks-lifecycle.yml
