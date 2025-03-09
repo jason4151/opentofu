@@ -44,4 +44,4 @@ terraform.tfvars
 *.swp
 *~
 .vscode/
-.idea/.tfbackend
+.idea/
