@@ -39,7 +39,10 @@ resource "aws_iam_role" "github_actions_role" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:jason4151/opentofu:*" # Grants access to all refs in jason4151/opentofu
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:jason4151/opentofu:*",          # Grants access to all refs in jason4151/opentofu
+              "repo:jason4151/subnet-calculator:*"   # Grants access to all refs in jason4151/subnet-calculator
+            ]
           }
         }
       }
