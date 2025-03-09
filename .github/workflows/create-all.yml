@@ -27,7 +27,7 @@ jobs:
 
   deploy-vpc:
     needs: validate-confirmation
-    uses: ./.github/workflows/vpc-deploy.yml
+    uses: ./.github/workflows/vpc-lifecycle.yml
     with:
       action: apply
     secrets: inherit
