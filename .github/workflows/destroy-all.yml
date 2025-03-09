@@ -13,6 +13,10 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: destroy-all-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate-confirmation:
     runs-on: ubuntu-latest
