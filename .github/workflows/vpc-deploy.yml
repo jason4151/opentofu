@@ -87,13 +87,13 @@ jobs:
           echo "Plan generated at tfplan"
       - name: OpenTofu Apply
         if: (github.event_name == 'push' || inputs.action == 'apply') && steps.plan.outcome == 'success'
-        run: tofu apply -no-color -auto-approve tfplan > /dev/null 2>&1
+        run: tofu apply -no-color -auto-approve tfplan #> /dev/null 2>&1
       - name: OpenTofu Refresh
         if: inputs.action == 'refresh'
-        run: tofu refresh -no-color > /dev/null 2>&1
+        run: tofu refresh -no-color #> /dev/null 2>&1
       - name: OpenTofu Destroy
         if: inputs.action == 'destroy'
-        run: tofu destroy -no-color -auto-approve > /dev/null 2>&1
+        run: tofu destroy -no-color -auto-approve #> /dev/null 2>&1
       - name: Cleanup
         if: always() && (github.event_name == 'push' || inputs.action == 'plan' || inputs.action == 'apply')
         run: rm -f tfplan
