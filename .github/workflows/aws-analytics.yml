@@ -1,11 +1,11 @@
-name: Deploy EKS to AWS
+name: AWS - Analytics
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'eks/**'
+      - 'analytics/**'
   workflow_dispatch:
     inputs:
       action:
@@ -34,16 +34,16 @@ env:
   AWS_REGION: us-east-2
   TOFU_VERSION: 1.8.5
   TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
-  TF_STATE_KEY: eks/terraform.tfstate
+  TF_STATE_KEY: analytics/terraform.tfstate
   TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
 
 jobs:
   deploy:
-    name: Deploy EKS
+    name: Deploy Analytics
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: eks
+        working-directory: analytics
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -67,7 +67,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.terraform.d/plugin-cache
-          key: ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-${{ hashFiles('eks/*.tf') }}
+          key: ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-${{ hashFiles('analytics/*.tf') }}
           restore-keys: |
             ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-
       - name: OpenTofu Init

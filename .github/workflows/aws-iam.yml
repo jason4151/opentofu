@@ -1,11 +1,11 @@
-name: Deploy EC2 Jump Box to AWS
+name: AWS - IAM
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'ec2_jump_box/**'
+      - 'iam/**'
   workflow_dispatch:
     inputs:
       action:
@@ -17,14 +17,6 @@ on:
           - plan
           - apply
           - refresh
-          - destroy
-  workflow_call:
-    inputs:
-      action:
-        description: 'Action to perform'
-        required: true
-        type: string
-        default: 'plan'
 
 permissions:
   contents: read
@@ -34,16 +26,16 @@ env:
   AWS_REGION: us-east-2
   TOFU_VERSION: 1.8.5
   TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
-  TF_STATE_KEY: ec2_jump_box/terraform.tfstate
+  TF_STATE_KEY: iam/terraform.tfstate
   TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
 
 jobs:
   deploy:
-    name: Deploy EC2 Jump Box
+    name: Deploy IAM
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ec2_jump_box
+        working-directory: iam
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -67,7 +59,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.terraform.d/plugin-cache
-          key: ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-${{ hashFiles('ec2_jump_box/*.tf') }}
+          key: ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-${{ hashFiles('iam/*.tf') }}
           restore-keys: |
             ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-
       - name: OpenTofu Init
@@ -91,9 +83,6 @@ jobs:
       - name: OpenTofu Refresh
         if: inputs.action == 'refresh'
         run: tofu refresh -no-color
-      - name: OpenTofu Destroy
-        if: inputs.action == 'destroy'
-        run: tofu destroy -no-color -auto-approve
       - name: Cleanup
         if: always() && (github.event_name == 'push' || inputs.action == 'plan' || inputs.action == 'apply')
         run: rm -f tfplan

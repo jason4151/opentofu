@@ -1,4 +1,4 @@
-name: Destroy All AWS Environment
+name: AWS - Destroy All
 
 on:
   workflow_dispatch:

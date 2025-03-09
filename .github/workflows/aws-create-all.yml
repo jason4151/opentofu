@@ -1,4 +1,4 @@
-name: Create All AWS Environment
+name: AWS - Create AlL
 
 on:
   workflow_dispatch:
