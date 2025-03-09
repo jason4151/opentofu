@@ -46,7 +46,7 @@ jobs:
     needs:
       - destroy-analytics
       - destroy-eks
-      - destroy-ec2-jump-box
+      - destroy-jump-box
     uses: ./.github/workflows/vpc-lifecycle.yml
     with:
       action: destroy
