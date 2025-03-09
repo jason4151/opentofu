@@ -1,4 +1,4 @@
-name: Deploy EKS to AWS
+name: EKS Lifecycle
 
 on:
   push:
@@ -38,8 +38,8 @@ env:
   TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
 
 jobs:
-  deploy:
-    name: Deploy EKS
+  eks-lifecycle:
+    name: EKS Lifecycle
     runs-on: ubuntu-latest
     defaults:
       run:

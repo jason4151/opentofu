@@ -41,7 +41,7 @@ jobs:
 
   deploy-eks:
     needs: deploy-vpc
-    uses: ./.github/workflows/eks-deploy.yml
+    uses: ./.github/workflows/eks-lifecycle.yml
     with:
       action: apply
     secrets: inherit

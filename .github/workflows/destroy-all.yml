@@ -38,7 +38,7 @@ jobs:
 
   destroy-eks:
     needs: validate-confirmation
-    uses: ./.github/workflows/eks-deploy.yml
+    uses: ./.github/workflows/eks-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
