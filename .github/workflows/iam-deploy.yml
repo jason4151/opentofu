@@ -17,11 +17,7 @@ on:
           - plan
           - apply
           - refresh
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
+          
 permissions:
   contents: read
   id-token: write
