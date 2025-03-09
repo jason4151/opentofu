@@ -34,7 +34,7 @@ jobs:
 
   deploy-ec2-jump-box:
     needs: deploy-vpc
-    uses: ./.github/workflows/ec2-jump-box-deploy.yml
+    uses: ./.github/workflows/ec2-jump-box-lifecycle.yml
     with:
       action: apply
     secrets: inherit

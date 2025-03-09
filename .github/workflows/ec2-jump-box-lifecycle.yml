@@ -1,4 +1,4 @@
-name: Deploy EC2 Jump Box to AWS
+name: EC2 Jump Box Lifecycle
 
 on:
   push:
@@ -38,8 +38,8 @@ env:
   TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
 
 jobs:
-  deploy:
-    name: Deploy EC2 Jump Box
+  jump-box-lifecycle:
+    name: EC2 Jump Box Lifecycle
     runs-on: ubuntu-latest
     defaults:
       run:
