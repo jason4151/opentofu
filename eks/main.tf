@@ -193,6 +193,14 @@ resource "aws_security_group" "eks_nodes" {
     cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
   }
 
+  ingress {
+    description = "Allow HTTP from ELB for LoadBalancer service"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Temporary broad access; tighten later
+  }
+
   egress {
     description = "Allow outbound HTTPS to AWS services (ECR/S3/SSM)"
     from_port   = 443
