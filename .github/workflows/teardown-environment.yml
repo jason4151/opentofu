@@ -28,21 +28,21 @@ jobs:
   analytics-destroy:
     name: Destroy Analytics
     needs: confirm-destroy
-    uses: ./.github/workflows/analytics-lifecycle.yaml
+    uses: ./.github/workflows/analytics-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
   eks-destroy:
     name: Destroy EKS
     needs: confirm-destroy
-    uses: ./.github/workflows/eks-lifecycle.yaml
+    uses: ./.github/workflows/eks-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
   jump-box-destroy:
     name: Destroy Jump Box
     needs: confirm-destroy
-    uses: ./.github/workflows/jump-box-lifecycle.yaml
+    uses: ./.github/workflows/jump-box-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
@@ -52,7 +52,7 @@ jobs:
       - analytics-destroy
       - eks-destroy
       - jump-box-destroy
-    uses: ./.github/workflows/vpc-lifecycle.yaml
+    uses: ./.github/workflows/vpc-lifecycle.yml
     with:
       action: destroy
     secrets: inherit
