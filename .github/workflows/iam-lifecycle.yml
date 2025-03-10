@@ -56,7 +56,7 @@ jobs:
         with:
           tofu_version: ${{ env.TOFU_VERSION }}
       - name: Cache OpenTofu Providers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.terraform.d/plugin-cache
           key: ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-${{ hashFiles('iam/*.tf') }}
