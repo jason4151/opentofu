@@ -28,21 +28,21 @@ jobs:
   vpc-apply:
     name: Apply VPC
     needs: confirm-deploy
-    uses: ./.github/workflows/vpc-lifecycle.yaml
+    uses: ./.github/workflows/vpc-lifecycle.yml
     with:
       action: apply
     secrets: inherit
   jump-box-apply:
     name: Apply Jump Box
     needs: vpc-apply
-    uses: ./.github/workflows/jump-box-lifecycle.yaml
+    uses: ./.github/workflows/jump-box-lifecycle.yml
     with:
       action: apply
     secrets: inherit
   eks-apply:
     name: Apply EKS
     needs: vpc-apply
-    uses: ./.github/workflows/eks-lifecycle.yaml
+    uses: ./.github/workflows/eks-lifecycle.yml
     with:
       action: apply
     secrets: inherit
