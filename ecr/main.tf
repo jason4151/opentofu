@@ -3,7 +3,7 @@
 # ECR Repository for subnet-calculator
 resource "aws_ecr_repository" "subnet_calculator" {
   name                 = "lab/subnet-calculator"  # Namespaced under lab/
-  image_tag_mutability = "MUTABLE"               # Allows overwriting tags
+  image_tag_mutability = "MUTABLE"                # Allows overwriting tags
 
   # AES-256 encryption for images
   encryption_configuration {
