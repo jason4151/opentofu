@@ -14,11 +14,11 @@ This repository contains Infrastructure-as-Code (IaC) configurations using [Open
 ## Structure
 - **`vpc/`**: Defines a VPC with public/private subnets, NAT Gateway (optional), and VPC Endpoints (S3, ECR, DynamoDB).
 - **`iam/`**: Configures IAM roles and OIDC provider for GitHub Actions.
-- **`jump_box/`**: Provisions an EC2 instance in a private subnet with SSM access.
+- **`jump_box/`**: Deploys an EC2 instance in a private subnet with SSM access.
 - **`eks/`**: Sets up an EKS cluster with Spot instances and a load balancer for app exposure.
-- **`ecr/`**: Manages an ECR repository (`lab/*`) for app container images.
+- **`ecr/`**: Manages ECR repositories (`lab/*`) for app container images.
 - **`s3_state_bucket/`**: Creates an S3 bucket and DynamoDB table for OpenTofu state and locking.
-- **`analytics/`**: Configures Athena and Glue to analyze VPC Flow Logs.
+- **`analytics/`**: Configures Athena and Glue to analyze VPC Flow Logs stored in parquet format in S3.
 - **`.github/workflows/`**: GitHub Actions workflows for lifecycle management.
 
 ## Architecture
@@ -28,6 +28,6 @@ This repository contains Infrastructure-as-Code (IaC) configurations using [Open
 - Harden the jump box to CIS Amazon Linux 2023 standards using Ansible.
 - Add API Gateway with CloudFront and WAF for secure, scalable app frontends.
 - Implement an event-driven application using AWS Lambda and EventBridge.
-- Include an architecture diagram to visualize the infrastructure.
+- Complete an architecture diagram to visualize the infrastructure.
 - Expand modularity to support multi-region or multi-account setups.
 - Enhance EKS with monitoring (e.g., Prometheus, Grafana).
