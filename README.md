@@ -17,7 +17,7 @@ This repository contains Infrastructure-as-Code (IaC) configurations using [Open
 - **`jump_box/`**: Deploys an EC2 instance in a private subnet with SSM access.
 - **`eks/`**: Sets up an EKS cluster with Spot instances and a load balancer for app exposure.
 - **`ecr/`**: Manages ECR repositories (`lab/*`) for app container images.
-- **`s3_state_bucket/`**: Creates an S3 bucket and DynamoDB table for OpenTofu state and locking.
+- **`remote_state/`**: Creates an S3 bucket and DynamoDB table for OpenTofu state and locking.
 - **`analytics/`**: Configures Athena and Glue to analyze VPC Flow Logs stored in parquet format in S3.
 - **`.github/workflows/`**: GitHub Actions workflows for lifecycle management.
 
