@@ -1,5 +1,6 @@
 # OpenTofu
 [![Setup Environment](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml/badge.svg)](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml)
+
 [![Teardown Environment](https://github.com/jason4151/opentofu/actions/workflows/teardown-environment.yml/badge.svg)](https://github.com/jason4151/opentofu/actions/workflows/teardown-environment.yml)
 
 ## Purpose
@@ -18,7 +19,7 @@ This repository contains Infrastructure-as-Code (IaC) configurations using [Open
 - **`ecr/`**: Manages an ECR repository (`lab/*`) for app container images.
 - **`s3_state_bucket/`**: Creates an S3 bucket and DynamoDB table for OpenTofu state and locking.
 - **`analytics/`**: Configures Athena and Glue to analyze VPC Flow Logs.
-- **`.github/workflows/`**: GitHub Actions workflows for lifecycle management (e.g., `jump-box-lifecycle.yml`).
+- **`.github/workflows/`**: GitHub Actions workflows for lifecycle management.
 
 ## Architecture
 (Diagram in progress)
