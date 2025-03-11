@@ -1,6 +1,7 @@
 # OpenTofu
-[![Setup Environment](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml/badge.svg)](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml)
 
+## GitHub Actions Status
+[![Setup Environment](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml/badge.svg)](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml)
 [![Teardown Environment](https://github.com/jason4151/opentofu/actions/workflows/teardown-environment.yml/badge.svg)](https://github.com/jason4151/opentofu/actions/workflows/teardown-environment.yml)
 
 ## Purpose
