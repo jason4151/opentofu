@@ -8,6 +8,7 @@ This repository contains Infrastructure-as-Code (IaC) configurations using [Open
 - Designed for my AWS lab environment in `us-east-2`, this configuration is easily adaptable for production use with enhancements for an AWS multi-account organization.
 - Currently defines AWS resources such as VPC, IAM, EC2 (jump box), EKS, ECR, S3 (state storage and flow logs), and analytics (Athena/Glue).
 - Deploys infrastructure automatically or manually using GitHub Actions workflows with OIDC authentication to AWS.
+- Top-level GitHub Actions workflows allow me to set up and tear down this lab environment within minutes.
 - Applications are deployed to EKS using Helm Charts and GitHub Actions, with app code stored in separate repositories within my GitHub account.
 
 ## Structure
