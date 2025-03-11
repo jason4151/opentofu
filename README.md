@@ -1,5 +1,5 @@
 # OpenTofu
-[![Jump Box Lifecycle](https://github.com/jason4151/opentofu/actions/workflows/jump-box-lifecycle.yml/badge.svg)](https://github.com/jason4151/opentofu/actions/workflows/jump-box-lifecycle.yml)
+[![Setup Environment](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml/badge.svg)](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml)
 
 ## Purpose
 This repository contains Infrastructure-as-Code (IaC) configurations using [OpenTofu](https://opentofu.org/), an open-source fork of Terraform managed by the Linux Foundation. It manages AWS cloud resources for my personal lab environment. **OpenTofu maintains full compatibility with Terraform**, utilizing identical syntax, providers, and modules, while being community-driven.
