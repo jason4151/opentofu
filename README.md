@@ -2,23 +2,12 @@
 
 ## Purpose
 
-This repository contains infrastructure-as-code (IaC) configurations using OpenTofu, an open-source alternative to Terraform. It manages cloud resources (e.g., AWS) for my lab environment. It is **fully compatible with Terraform**, leveraging the same syntax, providers, and modules, while being community-driven and free of proprietary restrictions.
+This repository contains Infrastructure-as-Code (IaC) configurations using OpenTofu, an open-source fork of Terraform. It currently manages AWS cloud resources for my personal lab environment. OpenTofu maintains full compatibility with Terraform, utilizing identical syntax, providers, and modules, while being community-driven and managed by the Linux Foundation.
+- Designed for my AWS lab environment, this configuration is easily adaptable for production use with enhancements for an AWS multi-account organization.
+- Currently defines AWS resources such as VPC, IAM, EC2, EKS, and S3.
+- Deploys infrastructure automatically or manually using GitHub Actions workflows.
+- Applications are deployed to EKS using Helm Charts and GitHub Actions, with the applications being stored in separate repositories within my GitHub account.
 
-## Features
 
-- Manages resources like VPCs, EC2 instances, and S3 buckets.
-- Supports Terraform-compatible configurations.
-- Designed for lab use; adaptable for production with modular enhancements.
 
-## Usage
 
-1. Install OpenTofu (`tofu` CLI).
-2. Clone this repo: `git clone <repository-url>`
-3. Navigate to a project: `cd <project-directory>`
-4. Initialize: `tofu init`
-5. Deploy: `tofu apply`
-
-## Notes
-
-- Requires AWS credentials and access to `us-east-2`.
-- Customize via `variables.tf` or `terraform.tfvars`.
