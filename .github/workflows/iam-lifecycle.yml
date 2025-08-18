@@ -38,7 +38,7 @@ jobs:
         working-directory: iam
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Annotate Workflow Run Details
         run: |
           ACTION="${{ inputs.action || 'push' }}"
