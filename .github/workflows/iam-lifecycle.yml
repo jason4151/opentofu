@@ -47,7 +47,7 @@ jobs:
           echo "::notice title=Commit SHA::Commit: ${{ github.sha }}"
           echo "::notice title=OpenTofu Version::OpenTofu Version: ${{ env.TOFU_VERSION }}"
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
           aws-region: ${{ env.AWS_REGION }}
