@@ -16,7 +16,7 @@ This configuration is intended for a **lab environment**. It provides a simple, 
 - **Subnets**: 2 public and 2 private /26 subnets (64 IPs each) across 2 Availability Zones in `us-east-2`.
 - **Internet Gateway**: Enables internet access for public subnets.
 - **NAT Gateway**: Optional, with support for high availability (HA) across AZs if enabled.
-- **Security**: Default security group denies all traffic; custom NACL allows HTTP/HTTPS traffic.
+- **Security**: Default security group denies all traffic; custom NACL allows HTTP/HTTPS plus DNS and NTP (UDP 53/123).
 - **VPC Endpoints**: Gateway endpoints for S3 and DynamoDB to keep traffic internal.
 - **Flow Logs**: Logs rejected traffic to an S3 bucket with Parquet compression and a 1-day expiration for cost efficiency.
 

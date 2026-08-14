@@ -6,7 +6,7 @@ output "athena_database_name" {
 
 output "athena_table_name" {
   description = "Name of the Athena table"
-  value       = aws_glue_catalog_table.vpc_flow_logs.name  # Updated to reference Glue table
+  value       = aws_glue_catalog_table.vpc_flow_logs.name # Updated to reference Glue table
 }
 
 output "athena_workgroup_name" {

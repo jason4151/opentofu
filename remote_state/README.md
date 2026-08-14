@@ -27,8 +27,10 @@ This configuration is intended for a **lab environment** to store OpenTofu state
 ## How to Deploy
 To deploy the s3_state_bucket configuration:
 
+Apply this stack locally once. It is not part of the setup-environment workflow.
+
 ```bash
-cd s3_state_bucket
+cd remote_state
 tofu init
 tofu apply
 ```

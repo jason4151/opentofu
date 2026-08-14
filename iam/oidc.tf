@@ -1,6 +1,9 @@
 # iam/oidc.tf
 
-# Create the OIDC provider for GitHub Actions
+data "tls_certificate" "github" {
+  url = "https://token.actions.githubusercontent.com"
+}
+
 resource "aws_iam_openid_connect_provider" "github_actions" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -9,19 +12,14 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
   ]
 
   thumbprint_list = [
-    "6938fd4d98bab03faadb97b34396831e3780aea1", # GitHub's OIDC thumbprint (valid as of March 2025)
+    data.tls_certificate.github.certificates[0].sha1_fingerprint,
   ]
 
   tags = {
-    Name        = "GitHubActionsOIDC"
-    Environment = "lab"
-    Owner       = "jason4151"
-    Project     = "core-infra"
-    CostCenter  = "lab"
+    Name = "GitHubActionsOIDC"
   }
 }
 
-# IAM Role for GitHub Actions to assume
 resource "aws_iam_role" "github_actions_role" {
   name = "GitHubActionsRole"
 
@@ -40,8 +38,8 @@ resource "aws_iam_role" "github_actions_role" {
           }
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
-              "repo:jason4151/opentofu:*",          # Grants access to all refs in jason4151/opentofu
-              "repo:jason4151/subnet-calculator:*"   # Grants access to all refs in jason4151/subnet-calculator
+              "repo:jason4151/opentofu:ref:refs/heads/main",
+              "repo:jason4151/subnet-calculator:ref:refs/heads/main",
             ]
           }
         }
@@ -50,16 +48,49 @@ resource "aws_iam_role" "github_actions_role" {
   })
 
   tags = {
-    Name        = "GitHubActionsRole"
-    Environment = "lab"
-    Owner       = "jason4151"
-    Project     = "core-infra"
-    CostCenter  = "lab"
+    Name = "GitHubActionsRole"
   }
 }
 
-# Attach AdministratorAccess policy to the GitHub Actions role
-resource "aws_iam_role_policy_attachment" "github_actions_admin" {
+# Broad enough for this lab's stacks, without account-wide AdministratorAccess.
+resource "aws_iam_policy" "github_actions_lab" {
+  name        = "GitHubActionsLabPolicy"
+  description = "Permissions for OpenTofu GitHub Actions in this lab account"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "LabServices"
+        Effect = "Allow"
+        Action = [
+          "ec2:*",
+          "eks:*",
+          "ecr:*",
+          "s3:*",
+          "dynamodb:*",
+          "iam:*",
+          "athena:*",
+          "glue:*",
+          "logs:*",
+          "elasticloadbalancing:*",
+          "autoscaling:*",
+          "ssm:*",
+          "sts:GetCallerIdentity",
+          "sts:AssumeRole",
+          "sts:TagSession",
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:CreateGrant",
+          "cloudwatch:*",
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_lab" {
   role       = aws_iam_role.github_actions_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  policy_arn = aws_iam_policy.github_actions_lab.arn
 }

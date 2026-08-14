@@ -1,11 +1,6 @@
 name: ECR Lifecycle
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'ecr/**'
   workflow_dispatch:
     inputs:
       action:
@@ -32,10 +27,10 @@ permissions:
 
 env:
   AWS_REGION: us-east-2
-  TOFU_VERSION: 1.8.5
+  TOFU_VERSION: 1.10.7
   TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
   TF_STATE_KEY: ecr/terraform.tfstate
-  TF_LOCK_TABLE: ${{ secrets.TF_STATE_LOCK }}
+  TF_LOCK_TABLE: ${{ secrets.TF_LOCK_TABLE }}
 
 jobs:
   ecr-lifecycle:
@@ -46,16 +41,16 @@ jobs:
         working-directory: ecr
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Annotate Workflow Run Details
         run: |
-          ACTION="${{ inputs.action || 'push' }}"
+          ACTION="${{ inputs.action }}"
           echo "::notice title=Workflow Action::Action: $ACTION, Branch: ${{ github.ref_name }}"
           echo "::notice title=Workflow Start Time::Started: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           echo "::notice title=Commit SHA::Commit: ${{ github.sha }}"
           echo "::notice title=OpenTofu Version::OpenTofu Version: ${{ env.TOFU_VERSION }}"
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
           aws-region: ${{ env.AWS_REGION }}
@@ -64,7 +59,7 @@ jobs:
         with:
           tofu_version: ${{ env.TOFU_VERSION }}
       - name: Cache OpenTofu Providers
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.terraform.d/plugin-cache
           key: ${{ runner.os }}-tofu-${{ env.TOFU_VERSION }}-providers-${{ hashFiles('ecr/*.tf') }}
@@ -81,19 +76,19 @@ jobs:
         run: tofu validate
       - name: OpenTofu Plan
         id: plan
-        if: github.event_name == 'push' || inputs.action == 'plan' || inputs.action == 'apply'
+        if: inputs.action == 'plan' || inputs.action == 'apply'
         run: |
           tofu plan -out=tfplan -no-color
           echo "Plan generated at tfplan"
       - name: OpenTofu Apply
-        if: (github.event_name == 'push' || inputs.action == 'apply') && steps.plan.outcome == 'success'
-        run: tofu apply -no-color -auto-approve tfplan > /dev/null 2>&1
+        if: inputs.action == 'apply' && steps.plan.outcome == 'success'
+        run: tofu apply -no-color -auto-approve tfplan
       - name: OpenTofu Refresh
         if: inputs.action == 'refresh'
-        run: tofu refresh -no-color > /dev/null 2>&1
+        run: tofu refresh -no-color
       - name: OpenTofu Destroy
         if: inputs.action == 'destroy'
-        run: tofu destroy -no-color -auto-approve > /dev/null 2>&1
+        run: tofu destroy -no-color -auto-approve
       - name: Cleanup
-        if: always() && (github.event_name == 'push' || inputs.action == 'plan' || inputs.action == 'apply')
+        if: always() && (inputs.action == 'plan' || inputs.action == 'apply')
         run: rm -f tfplan

@@ -4,9 +4,6 @@ terraform.tfstate.backup
 *.tfstate
 *.tfstate.backup
 
-# OpenTofu/Terraform lock file (only local, not needed in repo if using remote state)
-.terraform.lock.hcl
-
 # OpenTofu/Terraform initialization directory
 .terraform/
 

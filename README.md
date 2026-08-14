@@ -1,33 +1,36 @@
 # OpenTofu
+
 [![Setup Environment](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml/badge.svg)](https://github.com/jason4151/opentofu/actions/workflows/setup-environment.yml)
 [![Teardown Environment](https://github.com/jason4151/opentofu/actions/workflows/teardown-environment.yml/badge.svg)](https://github.com/jason4151/opentofu/actions/workflows/teardown-environment.yml)
 
 ## Purpose
-This repository contains Infrastructure-as-Code (IaC) configurations using [OpenTofu](https://opentofu.org/), an open-source fork of Terraform managed by the Linux Foundation. It manages AWS cloud resources for my personal lab environment. **OpenTofu maintains full compatibility with Terraform**, utilizing identical syntax, providers, and modules, while being community-driven.
 
-- Designed for my AWS lab environment in `us-east-2`, this configuration is easily adaptable for production use with enhancements for an AWS multi-account organization.
-- Currently defines AWS resources such as VPC, IAM, EC2 (jump box), EKS, ECR, S3 (state storage and flow logs), and analytics (Athena/Glue).
-- Deploys infrastructure automatically or manually using GitHub Actions workflows with OIDC authentication to AWS.
-- Top-level GitHub Actions workflows allow me to set up and tear down this lab environment within minutes.
-- Applications are deployed to EKS using Helm Charts and GitHub Actions, with app code stored in separate repositories within my GitHub account.
+Personal AWS lab in `us-east-2`, managed with [OpenTofu](https://opentofu.org/) 1.10 and GitHub Actions (OIDC). This is a lab, not a multi-account production landing zone.
+
+## How to fire it up
+
+1. `remote_state/` and `iam/` are bootstrap. Apply those locally if the S3 state bucket or GitHub OIDC role do not already exist.
+2. From `main`, run **Set Up AWS Environment** and type `DEPLOY`. That applies VPC, then jump box, ECR, and **EKS Auto Mode** in parallel.
+3. Tear down with **Tear Down AWS Environment** and `DESTROY`.
+
+If an old managed-node-group cluster named `lab-eks-cluster` is still in the account, destroy that stack first. Auto Mode uses the same cluster name and a different resource set.
+
+IAM OIDC only trusts `refs/heads/main`. Run workflows from `main`.
 
 ## Structure
-- **`vpc/`**: Defines a VPC with public/private subnets, NAT Gateway (optional), and VPC Endpoints (S3, ECR, DynamoDB).
-- **`iam/`**: Configures IAM roles and OIDC provider for GitHub Actions.
-- **`jump_box/`**: Deploys an EC2 instance in a private subnet with SSM access.
-- **`eks/`**: Sets up an EKS cluster with Spot instances and a load balancer for app exposure.
-- **`ecr/`**: Manages ECR repositories (`lab/*`) for app container images.
-- **`remote_state/`**: Creates an S3 bucket and DynamoDB table for OpenTofu state and locking.
-- **`analytics/`**: Configures Athena and Glue to analyze VPC Flow Logs stored in parquet format in S3.
-- **`.github/workflows/`**: GitHub Actions workflows for lifecycle management.
 
-## Architecture
-(Diagram in progress)
+- **`vpc/`**: Public/private subnets, optional NAT, VPC endpoints, flow logs.
+- **`iam/`**: Lab IAM user (console bootstrap) and GitHub Actions OIDC role.
+- **`jump_box/`**: Private AL2023 instance with SSM.
+- **`eks/`**: EKS **Auto Mode** (Kubernetes 1.34). Access entries only, no `aws-auth` ConfigMap.
+- **`ecr/`**: `lab/subnet-calculator` repository.
+- **`remote_state/`**: S3 state bucket and DynamoDB lock table. Apply locally once.
+- **`analytics/`**: Athena/Glue over VPC flow logs. Optional; not in setup.
+- **`.github/workflows/`**: Per-stack plan/apply/destroy plus setup/teardown. No apply-on-push.
 
-## Future Enhancements
-- Harden the jump box to CIS Amazon Linux 2023 standards using Ansible.
-- Add API Gateway with CloudFront and WAF for secure, scalable app frontends.
-- Implement an event-driven application using AWS Lambda and EventBridge.
-- Complete an architecture diagram to visualize the infrastructure.
-- Expand modularity to support multi-region or multi-account setups.
-- Enhance EKS with monitoring (e.g., Prometheus, Grafana).
+## Notes
+
+- OpenTofu `>= 1.10.0`, AWS provider `~> 5.100`. Lock files are committed.
+- NAT Gateway is on by default and is the main idle cost. Set `enable_nat_gateway = false` if you do not need outbound from private subnets.
+- EKS public API defaults to `0.0.0.0/0` so the lab is reachable. Override `public_endpoint_cidr` with your IP when you can.
+- GitHub Actions role uses a lab policy (EC2/EKS/ECR/S3/IAM/…) rather than `AdministratorAccess`. Your `jason4151` IAM user is still admin for console/bootstrap.

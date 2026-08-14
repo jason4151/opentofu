@@ -1,20 +1,38 @@
 # remote_state/main.tf
+# Bootstrap stack. Apply locally once; it is not part of setup-environment.yml.
+
+terraform {
+  required_version = ">= 1.10.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.100"
+    }
+  }
+}
 
 provider "aws" {
   region = "us-east-2"
+
+  default_tags {
+    tags = {
+      Environment = "lab"
+      Owner       = "jason4151"
+      Project     = "core-infra"
+      CostCenter  = "lab"
+    }
+  }
 }
 
-# Create an S3 bucket to store OpenTofu state files
 resource "aws_s3_bucket" "tofu_state" {
   bucket = "opentofu-state-bucket-jason4151"
 
-  # Prevent accidental deletion of the bucket
   lifecycle {
     prevent_destroy = true
   }
 }
 
-# Enable versioning on the bucket to protect state file history
 resource "aws_s3_bucket_versioning" "tofu_state_versioning" {
   bucket = aws_s3_bucket.tofu_state.id
 
@@ -23,7 +41,6 @@ resource "aws_s3_bucket_versioning" "tofu_state_versioning" {
   }
 }
 
-# Apply server-side encryption to secure state files
 resource "aws_s3_bucket_server_side_encryption_configuration" "tofu_state_encryption" {
   bucket = aws_s3_bucket.tofu_state.id
 
@@ -34,7 +51,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "tofu_state_encryp
   }
 }
 
-# Block all public access to the bucket for security
 resource "aws_s3_bucket_public_access_block" "tofu_state_public_access" {
   bucket = aws_s3_bucket.tofu_state.id
 
@@ -44,7 +60,6 @@ resource "aws_s3_bucket_public_access_block" "tofu_state_public_access" {
   restrict_public_buckets = true
 }
 
-# Create a DynamoDB table for state locking to prevent concurrent edits
 resource "aws_dynamodb_table" "tofu_state_lock" {
   name         = "opentofu-state-lock-jason4151"
   billing_mode = "PAY_PER_REQUEST"

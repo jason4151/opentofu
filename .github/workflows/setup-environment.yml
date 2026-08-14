@@ -39,8 +39,15 @@ jobs:
     with:
       action: apply
     secrets: inherit
+  ecr-apply:
+    name: Apply ECR
+    needs: vpc-apply
+    uses: ./.github/workflows/ecr-lifecycle.yml
+    with:
+      action: apply
+    secrets: inherit
   eks-apply:
-    name: Apply EKS
+    name: Apply EKS Auto Mode
     needs: vpc-apply
     uses: ./.github/workflows/eks-lifecycle.yml
     with:

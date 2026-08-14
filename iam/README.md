@@ -7,8 +7,10 @@ This module manages IAM resources for the lab environment, specifically the `jas
 This module defines and manages the `jason4151` IAM user, which is used for deploying and managing AWS resources via OpenTofu with full `AdministratorAccess` privileges. A "chicken and egg" problem arises because `jason4151` must exist with sufficient permissions to deploy OpenTofu configs (e.g., create S3 state bucket, DynamoDB table), yet this module is intended to manage it. To resolve this, `jason4151` was initially created manually in the AWS Console with `AdministratorAccess` and access keys to bootstrap the environment. After setup, the user and its policy were imported into OpenTofu state using `tofu import` to bring it under Infrastructure-as-Code (IaC) control. Access keys are not managed here and must be created manually in the Console for security.
 
 ## Resources
-- `aws_iam_user.jason4151`: The `jason4151` user with standard lab tags.
-- `aws_iam_user_policy_attachment.admin_access`: Attaches `arn:aws:iam::aws:policy/AdministratorAccess` to `jason4151`.
+- `aws_iam_user.jason4151`: Console/bootstrap user with `AdministratorAccess`.
+- `aws_iam_openid_connect_provider.github_actions`: GitHub OIDC provider (thumbprint from `tls_certificate`).
+- `aws_iam_role.github_actions_role`: Assumable from `main` on `jason4151/opentofu` and `jason4151/subnet-calculator`.
+- `aws_iam_policy.github_actions_lab`: Lab-scoped policy for the GitHub Actions role (not AdministratorAccess).
 
 ## Prerequisites
 - AWS CLI configured with existing `jason4151` credentials (access key and secret key created manually in the Console).

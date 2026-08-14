@@ -46,12 +46,20 @@ jobs:
     with:
       action: destroy
     secrets: inherit
+  ecr-destroy:
+    name: Destroy ECR
+    needs: confirm-destroy
+    uses: ./.github/workflows/ecr-lifecycle.yml
+    with:
+      action: destroy
+    secrets: inherit
   vpc-destroy:
     name: Destroy VPC
     needs:
       - analytics-destroy
       - eks-destroy
       - jump-box-destroy
+      - ecr-destroy
     uses: ./.github/workflows/vpc-lifecycle.yml
     with:
       action: destroy

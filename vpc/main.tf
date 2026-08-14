@@ -271,6 +271,40 @@ resource "aws_network_acl" "main" {
     from_port  = 1024
     to_port    = 65535
   }
+  # DNS (VPC resolver and queries that leave the VPC)
+  ingress {
+    protocol   = "udp"
+    rule_no    = 130
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 53
+    to_port    = 53
+  }
+  egress {
+    protocol   = "udp"
+    rule_no    = 130
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 53
+    to_port    = 53
+  }
+  # Amazon Time Sync (169.254.169.123)
+  ingress {
+    protocol   = "udp"
+    rule_no    = 140
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 123
+    to_port    = 123
+  }
+  egress {
+    protocol   = "udp"
+    rule_no    = 140
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 123
+    to_port    = 123
+  }
 
   tags = {
     Name        = "lab-main-nacl"
@@ -396,6 +430,25 @@ resource "aws_s3_bucket" "flow_logs" {
     Owner       = "jason4151"
     Project     = "core-infra"
     CostCenter  = "lab"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "flow_logs" {
+  bucket = aws_s3_bucket.flow_logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "flow_logs" {
+  bucket = aws_s3_bucket.flow_logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
   }
 }
 

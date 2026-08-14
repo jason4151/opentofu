@@ -1,11 +1,29 @@
 # vpc/provider.tf
 
-provider "aws" {
-  region = "us-east-2"
-}
-
 terraform {
+  required_version = ">= 1.10.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.100"
+    }
+  }
+
   backend "s3" {
     # Bucket, key, region, and dynamodb_table provided by workflow secrets
+  }
+}
+
+provider "aws" {
+  region = "us-east-2"
+
+  default_tags {
+    tags = {
+      Environment = "lab"
+      Owner       = "jason4151"
+      Project     = "core-infra"
+      CostCenter  = "lab"
+    }
   }
 }
