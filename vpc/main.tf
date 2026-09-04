@@ -107,11 +107,13 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = "lab-public-subnet-${count.index}"
-    Environment = "lab"
-    Owner       = "jason4151"
-    Project     = "core-infra"
-    CostCenter  = "lab"
+    Name                     = "lab-public-subnet-${count.index}"
+    Environment              = "lab"
+    Owner                    = "jason4151"
+    Project                  = "core-infra"
+    CostCenter               = "lab"
+    "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/lab-eks-cluster" = "shared"
   }
 }
 
@@ -123,11 +125,13 @@ resource "aws_subnet" "private" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name        = "lab-private-subnet-${count.index}"
-    Environment = "lab"
-    Owner       = "jason4151"
-    Project     = "core-infra"
-    CostCenter  = "lab"
+    Name                              = "lab-private-subnet-${count.index}"
+    Environment                       = "lab"
+    Owner                             = "jason4151"
+    Project                           = "core-infra"
+    CostCenter                        = "lab"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/lab-eks-cluster" = "shared"
   }
 }
 
