@@ -2,12 +2,12 @@
 # Bootstrap stack. Apply locally once; it is not part of setup-environment.yml.
 
 terraform {
-  required_version = ">= 1.10.0"
+  required_version = ">= 1.12.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.100"
+      version = "~> 6.0"
     }
   }
 }

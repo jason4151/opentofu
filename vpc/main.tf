@@ -133,7 +133,8 @@ resource "aws_subnet" "private" {
 
 # Elastic IP for NAT Gateway
 resource "aws_eip" "nat" {
-  count = var.enable_nat_gateway ? (var.ha_nat_gateways ? 2 : 1) : 0
+  count  = var.enable_nat_gateway ? (var.ha_nat_gateways ? 2 : 1) : 0
+  domain = "vpc"
 
   tags = {
     Name        = "lab-nat-eip-${count.index}"

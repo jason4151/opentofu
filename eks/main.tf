@@ -80,7 +80,7 @@ resource "aws_iam_role_policy_attachment" "eks_auto_node" {
 resource "aws_eks_cluster" "main" {
   name                          = "lab-eks-cluster"
   role_arn                      = aws_iam_role.eks_cluster.arn
-  version                       = "1.34"
+  version                       = "1.36"
   bootstrap_self_managed_addons = false
 
   access_config {
